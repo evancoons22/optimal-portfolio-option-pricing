@@ -1,0 +1,8 @@
+lib: [
+  "_build/install/default/lib/op/META"
+  "_build/install/default/lib/op/dune-package"
+  "_build/install/default/lib/op/opam"
+]
+bin: [
+  "_build/install/default/bin/op"
+]

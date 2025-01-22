@@ -1,0 +1,5 @@
+(executable
+ (public_name op)
+ (name main)
+ (modules main linalg lib)
+ (libraries op))
