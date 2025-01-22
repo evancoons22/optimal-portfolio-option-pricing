@@ -1,4 +1,0 @@
-(lang dune 3.17)
-(name op)
-(sections (lib .) (bin ../../bin))
-(files (lib (META dune-package opam)) (bin (op)))
