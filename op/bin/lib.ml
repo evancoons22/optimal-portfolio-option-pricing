@@ -60,3 +60,44 @@ let min_risk_portfolio cov_matrix =
         Printf.printf "Unexpected error: %s\n" (Printexc.to_string e);
         raise e
 
+let min_risk_portfolio_e cov r l1 l2 = 
+    let n  = List.length r in
+    let ones = List.init n (fun _ -> 1.0) in
+    let result = List.map2  (fun x y -> x *. l1 +. y *. l2) ones r in
+    Linalg.mat_vec_mul (Linalg.inverse cov) result
+
+
+let fun_A cov returns = 
+    match cov with
+    | [] -> failwith "Empty covariance matrix"
+    | _ -> 
+        match returns with 
+        | [] -> failwith "Empty returns vector"
+        | _ -> 
+            let n = List.length cov in
+            let ones = List.init n (fun _ -> 1.0) in
+            let invcov = Linalg.inverse cov in
+            Linalg.dot_product (Linalg.mat_vec_mul invcov ones) returns
+
+let fun_B cov returns = 
+    match cov with
+    | [] -> failwith "need covariance"
+    | _ -> 
+        match returns with 
+        | [] -> failwith "need return" 
+        | _ -> 
+            let invcov = Linalg.inverse cov in
+            Linalg.dot_product (Linalg.mat_vec_mul invcov returns) returns
+
+let fun_C cov = 
+    match cov with
+    | [] -> failwith "need covariance"
+    | _ -> 
+        List.fold_left (fun acc row -> acc +. List.fold_left (+.) 0.0 row) 0.0 cov
+
+let fun_lambda_1 a b c e = 
+    (c *. e -. a) /. (b *. c -. a *. a)
+
+let fun_lambda_2 a b c e = 
+    (b -. a *. e) /. (b *. c -. a *. a)
+

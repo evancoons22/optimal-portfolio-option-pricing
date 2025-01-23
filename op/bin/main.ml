@@ -63,24 +63,43 @@ let () =
     | e -> Printf.printf "Error calculating variance for %s: %s\n" header (Printexc.to_string e)
   ) headers stock_data;
   
-    (* First convert strings to floats, then calculate returns *)
-    let returns = List.map (fun stock_prices -> 
-        let float_prices = List.map float_of_string stock_prices in
-        Lib.get_returns float_prices
-    ) stock_data in
+    (* Convert all stock data to floats once *)
+    let float_data = List.map (fun stock_prices -> List.map float_of_string stock_prices) stock_data in
+    
+    (* Calculate returns once *)
+    let returns = List.map Lib.get_returns float_data in
     let e_returns = List.map Linalg.mean returns in
     Printf.printf "\nReturns:";
-    Linalg.print_vec e_returns  headers;
+    Linalg.print_vec e_returns headers;
 
+    (* Calculate covariance matrix once *)
     Printf.printf "\nCovariance Matrix:\n";
-    let cov_matrix = Linalg.covariance_matrix stock_data  in
+    let cov_matrix = Linalg.covariance_matrix stock_data in
     Linalg.print_mat cov_matrix headers;
 
     Printf.printf "\nInverse Covariance Matrix:\n";
     let cov_mat_inv = Linalg.inverse cov_matrix in
     Linalg.print_mat cov_mat_inv headers;
 
+    (* Calculate minimum risk portfolio *)
     Printf.printf "\nOptimal Portfolio:";
     let cmi = Lib.min_risk_portfolio cov_matrix in
     Linalg.print_vec cmi headers;
+
+    (* Calculate portfolio with expected return *)
+    let e = 0.00001 in
+    Printf.printf "\nOptimal Portfolio with expected return E = %f" e;
+    let a_const = Lib.fun_A cov_matrix e_returns in
+    let b_const = Lib.fun_B cov_matrix e_returns in
+    let c_const = Lib.fun_C cov_matrix in
+    let l1 = Lib.fun_lambda_1 a_const b_const c_const e in 
+    let l2 = Lib.fun_lambda_2 a_const b_const c_const e in 
+    let result = Lib.min_risk_portfolio_e cov_matrix e_returns l1 l2 in
+    Linalg.print_vec result headers;
+
+    (*
+    Printf.printf "\nOptimal Portfolio with expected return: %f" e;
+    Printf.printf "A: %f\nB: %f\nC: %f\n" a_const b_const c_const;
+    Printf.printf "l1 = %f,\nl2 = %f" l1 l2;
+    *)
 
