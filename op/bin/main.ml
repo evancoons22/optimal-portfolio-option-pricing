@@ -84,10 +84,13 @@ let () =
     (* Calculate minimum risk portfolio *)
     Printf.printf "\nOptimal Portfolio:";
     let cmi = Lib.min_risk_portfolio cov_matrix in
+    let sigma_2 = Lib.x_E_x cmi cov_matrix in
+    Printf.printf "\nsigma^2 = %f" sigma_2; 
+    Printf.printf "\nsigma = %f" (sqrt sigma_2);
     Linalg.print_vec cmi headers;
 
     (* Calculate portfolio with expected return *)
-    let e = 0.00001 in
+    let e = 0.0001 in
     Printf.printf "\nOptimal Portfolio with expected return E = %f" e;
     let a_const = Lib.fun_A cov_matrix e_returns in
     let b_const = Lib.fun_B cov_matrix e_returns in
@@ -95,11 +98,17 @@ let () =
     let l1 = Lib.fun_lambda_1 a_const b_const c_const e in 
     let l2 = Lib.fun_lambda_2 a_const b_const c_const e in 
     let result = Lib.min_risk_portfolio_e cov_matrix e_returns l1 l2 in
+    let sigma_2 = Lib.x_E_x result cov_matrix in
+    Printf.printf "\nsigma^2 = %f" sigma_2; 
+    Printf.printf "\nsigma = %f" (sqrt sigma_2);
     Linalg.print_vec result headers;
 
-    (*
-    Printf.printf "\nOptimal Portfolio with expected return: %f" e;
-    Printf.printf "A: %f\nB: %f\nC: %f\n" a_const b_const c_const;
-    Printf.printf "l1 = %f,\nl2 = %f" l1 l2;
-    *)
-
+    (*With risk free rate Rf = 0.0001 *) 
+    let r_f = 0.0001 in
+    Printf.printf "\nOptimal Portfolio with risk free rate = %f" r_f;
+    let returns_risk_free = List.map (fun x -> x -. r_f) e_returns in
+    let portfolio_risk_free = Lib.min_risk_portfolio_risk_free_asset cov_matrix returns_risk_free in 
+    let sigma_2 = Lib.x_E_x portfolio_risk_free cov_matrix in
+    Printf.printf "\nsigma^2 = %f" sigma_2; 
+    Printf.printf "\nsigma = %f" (sqrt sigma_2);
+    Linalg.print_vec portfolio_risk_free headers;
