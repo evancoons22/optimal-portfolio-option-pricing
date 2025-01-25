@@ -22,7 +22,7 @@ def download_data(tickers, start_date="2020-01-01", end_date="2024-12-31"):
     print(f"Data saved to {output_filename}")
 
 # List of tickers
-tickers = ["AAPL", "SPY", "GOOGL"]
+tickers = ["SPY", "AAPL", "GOOGL", "NVDA"]
 
 # Download and save the data
 download_data(tickers)

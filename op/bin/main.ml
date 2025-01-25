@@ -92,23 +92,32 @@ let () =
     (* Calculate portfolio with expected return *)
     let e = 0.0001 in
     Printf.printf "\nOptimal Portfolio with expected return E = %f" e;
-    let a_const = Lib.fun_A cov_matrix e_returns in
-    let b_const = Lib.fun_B cov_matrix e_returns in
-    let c_const = Lib.fun_C cov_matrix in
-    let l1 = Lib.fun_lambda_1 a_const b_const c_const e in 
-    let l2 = Lib.fun_lambda_2 a_const b_const c_const e in 
-    let result = Lib.min_risk_portfolio_e cov_matrix e_returns l1 l2 in
+    let result = Lib.min_risk_portfolio_e cov_matrix e_returns e in
     let sigma_2 = Lib.x_E_x result cov_matrix in
     Printf.printf "\nsigma^2 = %f" sigma_2; 
     Printf.printf "\nsigma = %f" (sqrt sigma_2);
     Linalg.print_vec result headers;
 
     (*With risk free rate Rf = 0.0001 *) 
+    (*tangent portfolio*)
     let r_f = 0.0001 in
     Printf.printf "\nOptimal Portfolio with risk free rate = %f" r_f;
-    let returns_risk_free = List.map (fun x -> x -. r_f) e_returns in
-    let portfolio_risk_free = Lib.min_risk_portfolio_risk_free_asset cov_matrix returns_risk_free in 
+    let portfolio_risk_free = Lib.min_risk_portfolio_risk_free_asset cov_matrix e_returns r_f in 
     let sigma_2 = Lib.x_E_x portfolio_risk_free cov_matrix in
     Printf.printf "\nsigma^2 = %f" sigma_2; 
     Printf.printf "\nsigma = %f" (sqrt sigma_2);
     Linalg.print_vec portfolio_risk_free headers;
+
+    (*for expected return AND risk free rate, look at the capital allocation line*)
+
+    (*Single index model*)
+    let portfolio_single_index = Lib.single_index_portfolio headers returns  in
+    Printf.printf "\nSingle Index Model:";
+    Linalg.print_vec portfolio_single_index headers;
+
+    (*regress each stock on SPX *)
+
+
+    (*Multi index model*)
+
+    (*multi group model? might be annoying to implement*)
