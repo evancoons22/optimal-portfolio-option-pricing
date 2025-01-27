@@ -240,4 +240,47 @@ let single_index_portfolio headers returns  =
     (* Use the existing min_risk_portfolio_e function with the constructed covariance matrix *)
     min_risk_portfolio cov_matrix
 
+(*
+========================= Print Functions ===============================
+*)
 
+let print_matrix_header headers =
+  Format.printf "@[<v 0>";
+  Format.printf "%-10s |" "";  (* empty corner cell *)
+  List.iter (fun h -> Format.printf " %-10s |" h) headers;
+  Format.printf "@,";
+  Format.printf "%s" (String.make (12 * (List.length headers + 1)) '-');
+  Format.printf "@]@,"
+
+let print_matrix_row label row =
+  Format.printf "@[<h>%-10s |" label;
+  List.iter (fun v -> Format.printf " %10.4f |" v) row;
+  Format.printf "@]@,"
+
+let print_portfolio_table headers portfolios portfolio_names =
+  Format.printf "@[<v 0>";
+  (* Header row *)
+  Format.printf "%-22s |" "Stock/Portfolio";
+  List.iter (fun name -> Format.printf " %22s |" name) portfolio_names;
+  Format.printf "@,";
+  Format.printf "%s" (String.make (25 * (List.length portfolio_names + 1)) '-');
+  Format.printf "@,";
+  
+  (* Data rows *)
+  List.iteri (fun i header ->
+    Format.printf "%-22s |" header;
+    List.iter (fun portfolio ->
+      Format.printf " %22.4f |" (List.nth portfolio i)
+    ) portfolios;
+    Format.printf "@,"
+  ) headers;
+  Format.printf "@]@,"
+
+let get_summary_stats portfolio cov_matrix e_returns =
+  (* Calculate expected return as weighted sum *)
+  let expected_return = Linalg.dot_product portfolio e_returns in
+  (* Calculate risk (standard deviation) *)
+  let risk = sqrt (x_E_x portfolio cov_matrix) in
+  (* Calculate Sharpe ratio *)
+  let sharpe = expected_return /. risk in
+  (expected_return, risk, sharpe)
