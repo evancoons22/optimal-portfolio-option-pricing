@@ -31,8 +31,8 @@ let () =
     | [] -> []
   in
 
-  (* Get first and last dates *)
-  let dates = match (List.hd all_rows, List.hd (List.rev all_rows)) with
+  (* Get first and last dates from data rows (skip header row) *)
+  let dates = match (List.hd data_rows, List.hd (List.rev data_rows)) with
     | (first :: _, last :: _) -> (first, last)
     | _ -> ("", "")
   in
@@ -46,6 +46,9 @@ let () =
 
   (* Print some information *)
   Printf.printf "Date range: %s to %s\n" (fst dates) (snd dates);
+
+  (* basic information, too verbose so commenting out *)
+  (*
   Printf.printf "Number of stocks: %d\n" (List.length headers);
   List.iter2 (fun header data -> 
       Printf.printf "Stock %s has %d data points\n" header (List.length data)
@@ -63,6 +66,7 @@ let () =
     | Failure _ -> Printf.printf "Could not calculate variance for %s (invalid number format)\n" header
     | e -> Printf.printf "Error calculating variance for %s: %s\n" header (Printexc.to_string e)
     ) headers stock_data;
+    *)
 
     (* Convert all stock data to floats once *)
     let float_data = List.map (fun stock_prices -> List.map float_of_string stock_prices) stock_data in
@@ -83,7 +87,7 @@ let () =
     Format.printf "@[<v>";
     Format.printf "Expected Returns:@,";
     List.iter2 (fun h r -> Format.printf "%-10s: %8.4f@," h r) headers e_returns;
-    Format.printf "@]@,@,";  (* Double newline for separation *)
+    Format.printf "@]@,";  (* Double newline for separation *)
 
     Format.printf "@[<v>";
     Format.printf "Covariance Matrix:@,";
@@ -91,7 +95,7 @@ let () =
     List.iteri (fun i row ->
         Lib.print_matrix_row (List.nth headers i) row
         ) cov_matrix;
-    Format.printf "@]@,@,";  (* Double newline for separation *)
+    Format.printf "@]@,";  (* Double newline for separation *)
 
     Format.printf "@[<v>";
     Format.printf "Inverse Covariance Matrix:@,";
@@ -99,7 +103,7 @@ let () =
     List.iteri (fun i row ->
         Lib.print_matrix_row (List.nth headers i) row
         ) cov_mat_inv;
-    Format.printf "@]@,@,";
+    Format.printf "@]@,";
 
     (* Calculate all portfolios *)
     let e = 0.0001 in
