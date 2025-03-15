@@ -18,8 +18,40 @@ let binom n k =
       in
     loop 1 1
 
+
+let normal_cdf z =
+  (* Constants for Abramowitz and Stegun approximation (1964) *)
+  let a1 = 0.254829592 in
+  let a2 = -0.284496736 in
+  let a3 = 1.421413741 in
+  let a4 = -1.453152027 in
+  let a5 = 1.061405429 in
+  let p = 0.3275911 in
+  
+  (* Take absolute value of z *)
+  let abs_z = abs_float z in
+  
+  (* Calculate t *)
+  let t = 1.0 /. (1.0 +. p *. abs_z) in
+  
+  (* Calculate erf approximation *)
+  let erf = 1.0 -. ((((a5 *. t +. a4) *. t +. a3) *. t +. a2) *. t +. a1) *. t *. exp (-.abs_z *. abs_z) in
+  
+  (* Adjust for sign of z *)
+  if z >= 0.0 then 0.5 +. 0.5 *. erf
+  else 0.5 -. 0.5 *. erf
+
 let put_from_call c e r s0 = 
     c -. s0 +. e /. (1.0 +. r)
+
+let get_bsm_price r t strike_price stock_data =  
+    let last_price = List.hd (List.rev stock_data) in
+    let daily_volatility = get_log_returns stock_data |> Linalg.variance |> sqrt in
+    let annual_volatility = daily_volatility *. sqrt 252.0 in
+    let d_1 = (log ( last_price /. strike_price) +. (r +. 0.5 *. annual_volatility ** 2.0) *. t) /. (annual_volatility *. sqrt (t)) in 
+    let d_2 = d_1 -. annual_volatility *. sqrt ( t ) in
+    last_price *. normal_cdf (d_1) -. strike_price /. exp ( r *. t) *. normal_cdf (d_2)
+
 
 let get_option_price r n strike_price stock_data = 
   let n = float_of_int n in
@@ -52,7 +84,7 @@ let get_option_price r n strike_price stock_data =
 
 let () =
     (* Read the entire file *)
-    let ic = open_in "historical_prices.csv" in
+    let ic = open_in "data/historical_prices.csv" in
     let rec read_lines acc =
         try
             let line = input_line ic in
@@ -110,12 +142,17 @@ let () =
   let maximum_calls = latest_prices in 
   let maximum_puts = List.map( fun x -> x /. (1.0 +. r)) strike_prices in 
   
-  let call_prices = List.map2 ( fun x y -> get_option_price r n y x ) float_data strike_prices in 
+  let binomial_call_prices = List.map2 ( fun x y -> get_option_price r n y x ) float_data strike_prices in 
 
-  let put_prices = List.map2 (fun (c, e) s0 -> put_from_call c e r s0) 
-                   (List.combine call_prices strike_prices) 
+  let binomial_put_prices = List.map2 (fun (c, e) s0 -> put_from_call c e r s0) 
+                   (List.combine binomial_call_prices strike_prices) 
                    latest_prices in 
 
+  let bsm_call_prices = List.map2 ( fun s stock -> get_bsm_price r t s stock) strike_prices float_data in
+  let bsm_put_prices = List.map2 (fun (c, e) s0 -> put_from_call c e r s0) (List.combine bsm_call_prices strike_prices) latest_prices in 
+
   Lib.print_metadata r t n;
-  Lib.print_calls headers latest_prices strike_prices minimum_calls maximum_calls call_prices;
-  Lib.print_puts headers latest_prices strike_prices minimum_puts maximum_puts put_prices;
+  Lib.print_calls headers latest_prices strike_prices minimum_calls maximum_calls binomial_call_prices bsm_call_prices;
+  Lib.print_puts headers latest_prices strike_prices minimum_puts maximum_puts binomial_put_prices bsm_put_prices;
+
+

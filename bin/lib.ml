@@ -302,11 +302,11 @@ let print_metadata r t n  =
   Format.printf "@[<h>%s@]@," (String.make 60 '-');
   Format.printf "@]@,"
 
-let print_calls headers last_prices strike_prices minimum_calls maximum_calls call_prices = 
+let print_calls headers last_prices strike_prices minimum_calls maximum_calls binomial_call_prices bsm_call_prices = 
   Format.printf "@[<v 0>";
-  Format.printf "@[<h>%s@]@," (String.make 125 '=');
+  Format.printf "@[<h>%s@]@," (String.make 145 '=');
   Format.printf "@[<h>Call Option Pricing@]@,";
-  Format.printf "@[<h>%s@]@," (String.make 125 '=');
+  Format.printf "@[<h>%s@]@," (String.make 145 '=');
   
   (* Header row *)
   Format.printf "%-15s |" "Stock";
@@ -315,8 +315,9 @@ let print_calls headers last_prices strike_prices minimum_calls maximum_calls ca
   Format.printf " %15s |" "Min Price";
   Format.printf " %15s |" "Max Price";
   Format.printf " %15s |" "Binomial Price";
+  Format.printf " %15s |" "Black-Scholes";
   Format.printf "@,";
-  Format.printf "%s" (String.make 125 '-');
+  Format.printf "%s" (String.make 145 '-');
   Format.printf "@,";
   
   (* Data rows *)
@@ -326,18 +327,19 @@ let print_calls headers last_prices strike_prices minimum_calls maximum_calls ca
     Format.printf " %15.4f |" (List.nth strike_prices i);
     Format.printf " %15.4f |" (List.nth minimum_calls i);
     Format.printf " %15.4f |" (List.nth maximum_calls i);
-    Format.printf " %15.4f |" (List.nth call_prices i);
+    Format.printf " %15.4f |" (List.nth binomial_call_prices i);
+    Format.printf " %15.4f |" (List.nth bsm_call_prices i);
     Format.printf "@,"
   ) headers;
   
-  Format.printf "@[<h>%s@]@," (String.make 125 '-');
+  Format.printf "@[<h>%s@]@," (String.make 145 '-');
   Format.printf "@]@,"
 
-let print_puts headers last_prices strike_prices minimum_puts maximum_puts put_prices =
+let print_puts headers last_prices strike_prices minimum_puts maximum_puts binomial_put_prices bsm_put_prices =
   Format.printf "@[<v 0>";
-  Format.printf "@[<h>%s@]@," (String.make 125 '=');
+  Format.printf "@[<h>%s@]@," (String.make 145 '=');
   Format.printf "@[<h>Put Option Pricing@]@,";
-  Format.printf "@[<h>%s@]@," (String.make 125 '=');
+  Format.printf "@[<h>%s@]@," (String.make 145 '=');
   
   (* Header row *)
   Format.printf "%-15s |" "Stock";
@@ -346,8 +348,9 @@ let print_puts headers last_prices strike_prices minimum_puts maximum_puts put_p
   Format.printf " %15s |" "Min Price";
   Format.printf " %15s |" "Max Price";
   Format.printf " %15s |" "Binomial Price";
+  Format.printf " %15s |" "Black-Scholes";
   Format.printf "@,";
-  Format.printf "%s" (String.make 125 '-');
+  Format.printf "%s" (String.make 145 '-');
   Format.printf "@,";
   
   (* Data rows *)
@@ -357,11 +360,12 @@ let print_puts headers last_prices strike_prices minimum_puts maximum_puts put_p
     Format.printf " %15.4f |" (List.nth strike_prices i);
     Format.printf " %15.4f |" (List.nth minimum_puts i);
     Format.printf " %15.4f |" (List.nth maximum_puts i);
-    Format.printf " %15.4f |" (List.nth put_prices i);
+    Format.printf " %15.4f |" (List.nth binomial_put_prices i);
+    Format.printf " %15.4f |" (List.nth bsm_put_prices i);
     Format.printf "@,"
   ) headers;
   
-  Format.printf "@[<h>%s@]@," (String.make 125 '-');
+  Format.printf "@[<h>%s@]@," (String.make 145 '-');
   Format.printf "@]@,"
 
 

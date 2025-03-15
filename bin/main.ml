@@ -7,7 +7,7 @@ let split_by_comma str =
     (* entry point of the program *)
 let () =
     (* Read the entire file *)
-    let ic = open_in "historical_prices.csv" in
+    let ic = open_in "data/historical_prices.csv" in
     let rec read_lines acc =
         try
             let line = input_line ic in
