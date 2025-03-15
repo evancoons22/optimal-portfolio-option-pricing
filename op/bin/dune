@@ -3,3 +3,8 @@
  (name main)
  (modules main linalg lib)
  (libraries op))
+
+(executable
+ (public_name option)
+ (name option_pricing)
+ (modules option_pricing main linalg lib))

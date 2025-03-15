@@ -7,7 +7,12 @@
 - [ ] constant correlation model    
 
 ### Option Pricing 
-- [ ] binomial option pricing model
+- [X] binomial option pricing model
 - [ ] black scholes pricing model
 
+### Running the program
+```
+$ dune exec op // for optimal portfolio
+$ dune exec option // for option pricing
+```
 
