@@ -1,8 +1,7 @@
 (executable
  (public_name op)
  (name main)
- (modules main linalg lib)
- (libraries op))
+ (modules main linalg lib))
 
 (executable
  (public_name option)
