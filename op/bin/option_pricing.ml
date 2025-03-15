@@ -104,8 +104,8 @@ let () =
   let strike_prices = List.map (fun x -> x +. 2.0) latest_prices in
   
   (* Calculate minimum call prices *)
-  let minimum_calls = List.map2 (fun price strike -> price -. strike /. (1.0 +. r)) latest_prices strike_prices in
-  let minimum_puts = List.map2 (fun price strike -> strike /. (1.0 +. r) -. price) latest_prices strike_prices in
+  let minimum_calls = List.map2 (fun price strike -> max 0.0 (price -. strike /. (1.0 +. r))) latest_prices strike_prices in
+  let minimum_puts = List.map2 (fun price strike -> max 0.0 (strike /. (1.0 +. r) -. price)) latest_prices strike_prices in
 
   let maximum_calls = latest_prices in 
   let maximum_puts = List.map( fun x -> x /. (1.0 +. r)) strike_prices in 
